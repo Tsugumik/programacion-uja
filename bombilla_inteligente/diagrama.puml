@@ -1,0 +1,15 @@
+@startuml
+class BombillaInteligente {
+  - nombre: str
+  - encendida: bool
+  - intensidad: int
+  - color: dict
+  + __init__(nombre: str)
+  + encender()
+  + apagar()
+  + obtener_estado(): str
+  + cambiar_intensidad(nivel: int): bool
+  + cambiar_color(r: int, g: int, b: int): bool
+  + __str__(): str
+}
+@enduml

@@ -1,36 +1,36 @@
-from bombilla_adt import *
+from bombilla_adt import BombillaInteligente
 
 def main():
     print("=== PRUEBAS DE VALIDACIÓN HU01 ===\n")
 
     # Crear bombilla
-    bombilla = creaBombilla("Bombilla_Salon")
+    bombilla = BombillaInteligente("Bombilla_Salon")
     print("1. CREACIÓN:")
-    imprimirBombilla(bombilla)
+    print(bombilla)
 
     # Test encender
     print("2. ENCENDER:")
-    encenderBombilla(bombilla)
-    imprimirBombilla(bombilla)
+    bombilla.encender()
+    print(bombilla)
 
     # Test cambiar intensidad
     print("3. CAMBIAR INTENSIDAD (50%):")
-    cambiarIntensidad(bombilla, 50)
-    imprimirBombilla(bombilla)
+    bombilla.cambiar_intensidad(50)
+    print(bombilla)
 
     # Test cambiar color (rojo)
     print("4. CAMBIAR COLOR (ROJO):")
-    cambiarColor(bombilla, 255, 0, 0)
-    imprimirBombilla(bombilla)
+    bombilla.cambiar_color(255, 0, 0)
+    print(bombilla)
 
     # Test obtener estado
     print("5. OBTENER ESTADO:")
-    print(obtenerEstado(bombilla))
+    print(bombilla.obtener_estado())
 
     # Test apagar
     print("\n6. APAGAR:")
-    apagarBombilla(bombilla)
-    imprimirBombilla(bombilla)
+    bombilla.apagar()
+    print(bombilla)
 
 
 if __name__ == "__main__":

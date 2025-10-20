@@ -1,52 +1,47 @@
-def creaBombilla(nombre="Bombilla_1"):
+class BombillaInteligente:
+    def __init__(self, nombre="Bombilla_1"):
+        self.nombre = nombre
+        self.encendida = False
+        self.intensidad = 0
+        self.color = {'r': 255, 'g': 255, 'b': 255}
 
-    return {
-        'nombre': nombre,
-        'encendida': False,
-        'intensidad': 0,
-        'color' : {
-            'r': 255,
-            'g': 255,
-            'b': 255
-        }
-    }
+    def encender(self):
+        self.encendida = True
+        if self.intensidad == 0:
+            self.intensidad = 100
 
-def encenderBombilla(bombilla):
-    bombilla['encendida'] = True
+    def apagar(self):
+        self.encendida = False
+        self.intensidad = 0
 
-    if bombilla['intensidad'] == 0:
-        bombilla['intensidad'] = 100
+    def obtener_estado(self):
+        estado = "ENCENDIDA" if self.encendida else "APAGADA"
+        return f"Bombilla '{self.nombre}': {estado}, Intensidad: {self.intensidad}%, Color: RGB({self.color['r']}, {self.color['g']}, {self.color['b']})"
 
-def apagarBombilla(bombilla):
-    bombilla['encendida'] = False
-    bombilla['intensidad'] = 0
+    def cambiar_intensidad(self, nivel):
+        if 0 <= nivel <= 100:
+            self.intensidad = nivel
+            return True
+        else:
+            print("Error: Intensidad debe estar entre 0 y 100")
+            return False
 
-def obtenerEstado(bombilla):
-    estado = "ENCENDIDA" if bombilla['encendida'] else "APAGADA"
-    return f"Bombilla '{bombilla['nombre']}': {estado}, Intensidad: {bombilla['intensidad']}%, Color: RGB({bombilla['color']['r']}, {bombilla['color']['g']}, {bombilla['color']['b']})"
+    def cambiar_color(self, r, g, b):
+        if all(0 <= valor <= 255 for valor in [r, g, b]):
+            self.color['r'] = r
+            self.color['g'] = g
+            self.color['b'] = b
+            return True
+        else:
+            print("Error: Color debe estar entre 0 y 255")
+            return False
 
-def cambiarIntensidad(bombilla, nivel):
-    if 0 <= nivel <= 100:
-        bombilla['intensidad'] = nivel
-        return True
-    else:
-        print("Error: Intensidad debe estar entre 0 y 100")
-        return False
-
-def cambiarColor(bombilla, r, g, b):
-    if all(0 <= valor <= 255 for valor in [r, g, b]):
-        bombilla['color']['r'] = r
-        bombilla['color']['g'] = g
-        bombilla['color']['b'] = b
-        return True
-    else:
-        print("Error: Color debe estar entre 0 y 255")
-        return False
-
-def imprimirBombilla(bombilla):
-    print("=" * 40)
-    print(f"BOMBILLA: {bombilla['nombre']}")
-    print(f"Estado: {'ENCENDIDA' if bombilla['encendida'] else 'APAGADA'}")
-    print(f"Intensidad: {bombilla['intensidad']}%")
-    print(f"Color RGB: ({bombilla['color']['r']}, {bombilla['color']['g']}, {bombilla['color']['b']})")
-    print("=" * 40)
+    def __str__(self):
+        header = "=" * 40
+        estado_str = 'ENCENDIDA' if self.encendida else 'APAGADA'
+        return (f"{header}\n"
+                f"BOMBILLA: {self.nombre}\n"
+                f"Estado: {estado_str}\n"
+                f"Intensidad: {self.intensidad}%\n"
+                f"Color RGB: ({self.color['r']}, {self.color['g']}, {self.color['b']})\n"
+                f"{header}")

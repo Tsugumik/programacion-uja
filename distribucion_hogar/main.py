@@ -1,58 +1,58 @@
-from aire_acondicionado.aire_acondicionado_adt import *
-from bombilla_inteligente.bombilla_adt import *
-from distribucion_hogar_adt import *
+from aire_acondicionado.aire_acondicionado_adt import AireAcondicionado
+from bombilla_inteligente.bombilla_adt import BombillaInteligente
+from distribucion_hogar_adt import Hogar
 
 def main():
     print("=== PRUEBAS DE VALIDACIÓN HU03 ===\n")
 
     # Crear hogar
-    hogar = crearHogar()
+    hogar = Hogar()
     print("1. CREACIÓN HOGAR:")
-    print(f"Habitaciones: {obtenerHabitaciones(hogar)}")
-    print(f"Dispositivos: {obtenerDispositivos(hogar)}\n")
+    print(f"Habitaciones: {hogar.obtener_habitaciones()}")
+    print(f"Dispositivos: {hogar.obtener_dispositivos()}\n")
 
     # Añadir habitaciones
     print("2. AÑADIR HABITACIONES:")
-    añadirHabitacion(hogar, "Salon")
-    añadirHabitacion(hogar, "Dormitorio")
-    print(f"Habitaciones: {obtenerHabitaciones(hogar)}\n")
+    hogar.anadir_habitacion("Salon")
+    hogar.anadir_habitacion("Dormitorio")
+    print(f"Habitaciones: {hogar.obtener_habitaciones()}\n")
 
     # Crear dispositivos
-    bombilla = creaBombilla("Bombilla_Salon")
-    aire = crearAireAcondicionado()
+    bombilla = BombillaInteligente("Bombilla_Salon")
+    aire = AireAcondicionado()
 
     # Añadir dispositivos al hogar
     print("3. AÑADIR DISPOSITIVOS:")
-    añadirDispositivo(hogar, "b1", bombilla, "Salon")
-    añadirDispositivo(hogar, "a1", aire, "Dormitorio")
-    print(f"Dispositivos: {obtenerDispositivos(hogar)}\n")
+    hogar.anadir_dispositivo("b1", bombilla, "Salon")
+    hogar.anadir_dispositivo("a1", aire, "Dormitorio")
+    print(f"Dispositivos: {hogar.obtener_dispositivos()}\n")
 
     # Contar dispositivos
     print("4. CONTAR DISPOSITIVOS:")
-    print(f"Total: {contarDispositivos(hogar)}")
-    print(f"En Salon: {contarDispositivosPorHabitacion(hogar, 'Salon')}")
-    print(f"En Dormitorio: {contarDispositivosPorHabitacion(hogar, 'Dormitorio')}\n")
+    print(f"Total: {hogar.contar_dispositivos()}")
+    print(f"En Salon: {hogar.contar_dispositivos_por_habitacion('Salon')}")
+    print(f"En Dormitorio: {hogar.contar_dispositivos_por_habitacion('Dormitorio')}\n")
 
     # Identificar ubicación
     print("5. IDENTIFICAR UBICACIÓN DISPOSITIVOS:")
-    print(f"Dispositivo 'b1' en: {identificarDispositivoUbicacion(hogar, 'b1')}")
-    print(f"Dispositivo 'a1' en: {identificarDispositivoUbicacion(hogar, 'a1')}\n")
+    print(f"Dispositivo 'b1' en: {hogar.identificar_dispositivo_ubicacion('b1')}")
+    print(f"Dispositivo 'a1' en: {hogar.identificar_dispositivo_ubicacion('a1')}\n")
 
     # Modificar dispositivo (ejemplo cambiar intensidad bombilla y temperatura aire)
     print("6. MODIFICAR DISPOSITIVOS:")
-    modificarDispositivo(hogar, 'b1', 'intensidad', 75)
-    modificarDispositivo(hogar, 'a1', 'temperatura', 20)
+    hogar.modificar_dispositivo('b1', 'intensidad', 75)
+    hogar.modificar_dispositivo('a1', 'temperatura', 20)
     print("Estado bombilla 'b1':")
-    imprimirBombilla(hogar['dispositivos']['b1']['objeto'])
+    print(hogar.dispositivos['b1']['objeto'])
     print("Estado aire acondicionado 'a1':")
-    imprimirAire(hogar['dispositivos']['a1']['objeto'])
+    print(hogar.dispositivos['a1']['objeto'])
     print()
 
     # Quitar dispositivo
     print("7. QUITAR DISPOSITIVO 'b1':")
-    quitarDispositivo(hogar, 'b1')
-    print(f"Dispositivos: {obtenerDispositivos(hogar)}")
-    print(f"Total: {contarDispositivos(hogar)}")
+    hogar.quitar_dispositivo('b1')
+    print(f"Dispositivos: {hogar.obtener_dispositivos()}")
+    print(f"Total: {hogar.contar_dispositivos()}")
 
 if __name__ == "__main__":
     main()

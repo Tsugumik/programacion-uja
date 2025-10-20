@@ -1,0 +1,16 @@
+@startuml
+class Hogar {
+  - habitaciones: list
+  - dispositivos: dict
+  + __init__()
+  + anadir_habitacion(nombre_habitacion: str): bool
+  + obtener_habitaciones(): list
+  + anadir_dispositivo(dispositivo_id: str, dispositivo_objeto: object, habitacion: str): bool
+  + quitar_dispositivo(dispositivo_id: str): bool
+  + modificar_dispositivo(dispositivo_id: str, propiedad: str, valor: any): bool
+  + contar_dispositivos(): int
+  + contar_dispositivos_por_habitacion(habitacion: str): int
+  + identificar_dispositivo_ubicacion(dispositivo_id: str): str
+  + obtener_dispositivos(): list
+}
+@enduml

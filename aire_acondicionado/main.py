@@ -1,31 +1,31 @@
-from aire_acondicionado_adt import *
+from aire_acondicionado_adt import AireAcondicionado
 
 def main():
     print("=== PRUEBAS DE VALIDACIÓN HU02 ===\n")
 
     # Crear aire acondicionado
-    aire = crearAireAcondicionado()
+    aire = AireAcondicionado()
     print("1. CREACIÓN:")
-    imprimirAire(aire)
+    print(aire)
 
     # Test encender
     print("2. ENCENDER:")
-    encenderAire(aire)
-    imprimirAire(aire)
+    aire.encender()
+    print(aire)
 
     # Test cambiar temperatura a 21 grados
     print("3. CAMBIAR TEMPERATURA (21°C):")
-    cambiarTemperatura(aire, 21)
-    imprimirAire(aire)
+    aire.cambiar_temperatura(21)
+    print(aire)
 
     # Test obtener estado
     print("4. OBTENER ESTADO:")
-    print(obtenerEstadoAire(aire))
+    print(aire.obtener_estado())
 
     # Test apagar
     print("\n5. APAGAR:")
-    apagarAire(aire)
-    imprimirAire(aire)
+    aire.apagar()
+    print(aire)
 
 if __name__ == "__main__":
     main()
