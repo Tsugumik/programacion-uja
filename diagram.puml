@@ -1,0 +1,62 @@
+@startuml
+' skinparam to make the diagram look better
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam linetype ortho
+
+' Define classes
+class Home {
+  - _rooms: list
+  - _devices: dict
+  + add_room(room_name: str)
+  + add_device(device_id: str, device_object: object, room: str)
+  + remove_device(device_id: str)
+  + get_device_location(device_id: str): str
+  + get_device_object(device_id: str): object
+  + count_devices(): int
+  + count_devices_by_room(room_name: str): int
+  + get_devices_in_room(room_name: str): list
+}
+
+class SmartBulb {
+  - _id_counter: int
+  - _id: str
+  - _name: str
+  - _is_on: bool
+  - _intensity: int
+  - _color: dict
+  - _is_programmable: bool
+  + turn_on()
+  + turn_off()
+  + get_status(): str
+  + change_intensity(level: int)
+  + change_color(r: int, g: int, b: int)
+}
+
+class AirConditioner {
+  - _id_counter: int
+  - _id: str
+  - _temperature: float
+  - _is_on: bool
+  + turn_on()
+  + turn_off()
+  + get_status(): str
+  + change_temperature(new_temperature: float)
+}
+
+class Scheduler {
+  - _smart_bulb: SmartBulb
+  - _schedule: list
+  + get_week_days(): list
+  + get_system_time(): str
+  + add_start_event(day: str, hour: int, minute: int, second: int)
+  + add_end_event(day: str, hour: int, minute: int, second: int)
+  + delete_event(day: str, hour: int, minute: int, second: int, action: str)
+}
+
+' Define relationships
+Home o-- "*" SmartBulb : contains
+Home o-- "*" AirConditioner : contains
+Scheduler ..> SmartBulb : schedules
+
+@enduml
