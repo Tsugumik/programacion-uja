@@ -1,62 +1,51 @@
 import itertools
+from .device import Device
 
-class AirConditioner:
-    """Represents a smart air conditioner."""
+class AirConditioner(Device):
+    """Represents a smart air conditioner, inheriting from Device."""
     _id_counter = itertools.count()
 
-    def __init__(self, temperature=24.0):
-        self._id = f"AC_{next(self._id_counter)}"
-        self._temperature = temperature
-        self._is_on = False
-
-    @property
-    def id(self):
-        """Gets the unique ID of the air conditioner."""
-        return self._id
-
-    @property
-    def temperature(self):
-        """Gets the current temperature of the air conditioner."""
-        return self._temperature
-
-    @property
-    def is_on(self):
-        """Checks if the air conditioner is on."""
-        return self._is_on
-
-    def turn_on(self):
-        """Turns the air conditioner on."""
-        self._is_on = True
-
-    def turn_off(self):
-        """Turns the air conditioner off."""
-        self._is_on = False
-
-    def get_status(self):
-        """Gets the current status of the air conditioner."""
-        status = "ON" if self._is_on else "OFF"
-        return f"Air conditioner is {status}, Temperature: {self._temperature}°C"
-
-    def change_temperature(self, new_temperature):
-        """
-        Changes the temperature of the air conditioner.
-
-        Args:
-            new_temperature (float): The new temperature.
-
-        Raises:
-            ValueError: If the temperature is not between 16 and 30 degrees Celsius.
-        """
-        if 16 <= new_temperature <= 30:
-            self._temperature = new_temperature
+    def __init__(self, name: str, initial_temp: int = 21):
+        super().__init__(min_intensity=16, max_intensity=30)
+        self._id = f"AC_{next(AirConditioner._id_counter)}"
+        self._name = name
+        
+        if self._min_intensity <= initial_temp <= self._max_intensity:
+            self._intensity = initial_temp
         else:
-            raise ValueError("Error: Temperature must be between 16 and 30 degrees Celsius.")
+            self._intensity = self._min_intensity
 
-    def __str__(self):
-        header = "=" * 40
-        status_str = 'ON' if self._is_on else 'OFF'
-        return (f"{header}\n"
-                f"CLIMATIZER\n"
-                f"Status: {status_str}\n"
-                f"Temperature: {self._temperature}°C\n"
-                f"{header}")
+    @property
+    def name(self) -> str:
+        """Gets the name of the AC unit."""
+        return self._name
+
+    @property
+    def temperature(self) -> int:
+        """Gets the current temperature (which is the intensity)."""
+        return self.intensity
+
+    def __str__(self) -> str:
+        status_str = "ON" if self.status else "OFF"
+        return (f"Device: {self.name} ({self.id})\n"
+                f"  Type: Air Conditioner\n"
+                f"  Status: {status_str}\n"
+                f"  Temperature: {self.temperature}°C")
+
+    def to_dict(self) -> dict:
+        """Returns a dictionary representation of the AC's state."""
+        data = super().to_dict()
+        data.update({
+            "type": "AirConditioner",
+            "name": self._name
+        })
+        return data
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Creates an AirConditioner instance from a dictionary."""
+        ac = cls(name=data["name"])
+        ac._id = data["id"]
+        ac._status = data["status"]
+        ac._intensity = data["intensity"]
+        return ac

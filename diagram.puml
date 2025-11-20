@@ -1,62 +1,103 @@
 @startuml
-' skinparam to make the diagram look better
+' Diagram settings
 skinparam classAttributeIconSize 0
 skinparam monochrome true
 skinparam linetype ortho
+hide empty members
 
-' Define classes
+title Smart Home System
+
+' --- Base and Core Classes ---
+
+abstract class Device {
+  - _id: str
+  - _status: bool
+  - _intensity: int
+  - _min_intensity: int
+  - _max_intensity: int
+  + <<property>> id: str
+  + <<property>> status: bool
+  + <<property>> intensity: int
+  + turn_on()
+  + turn_off()
+  + increase_intensity(amount: int)
+  + decrease_intensity(amount: int)
+  + to_dict(): dict
+}
+
 class Home {
+  - _name: str
   - _rooms: list
   - _devices: dict
+  - _schedulers: dict
+  + <<property>> name: str
+  + <<property>> rooms: list
+  + <<property>> devices: dict
   + add_room(room_name: str)
-  + add_device(device_id: str, device_object: object, room: str)
+  + add_device_to_room(device: Device, room: str)
   + remove_device(device_id: str)
-  + get_device_location(device_id: str): str
-  + get_device_object(device_id: str): object
-  + count_devices(): int
-  + count_devices_by_room(room_name: str): int
+  + get_device_by_id(device_id: str): Device
+  + get_scheduler_for_device(device_id: str): Scheduler
   + get_devices_in_room(room_name: str): list
-}
-
-class SmartBulb {
-  - _id_counter: int
-  - _id: str
-  - _name: str
-  - _is_on: bool
-  - _intensity: int
-  - _color: dict
-  - _is_programmable: bool
-  + turn_on()
-  + turn_off()
-  + get_status(): str
-  + change_intensity(level: int)
-  + change_color(r: int, g: int, b: int)
-}
-
-class AirConditioner {
-  - _id_counter: int
-  - _id: str
-  - _temperature: float
-  - _is_on: bool
-  + turn_on()
-  + turn_off()
-  + get_status(): str
-  + change_temperature(new_temperature: float)
+  + to_dict(): dict
+  + {static} from_dict(data: dict): Home
 }
 
 class Scheduler {
   - _smart_bulb: SmartBulb
   - _schedule: list
-  + get_week_days(): list
-  + get_system_time(): str
-  + add_start_event(day: str, hour: int, minute: int, second: int)
-  + add_end_event(day: str, hour: int, minute: int, second: int)
-  + delete_event(day: str, hour: int, minute: int, second: int, action: str)
+  + <<property>> smart_bulb: SmartBulb
+  + <<property>> schedule: list
+  + {static} get_week_days(): list
+  + {static} get_system_time(): str
+  - {static} _validate_event_time(day: str, h: int, m: int, s: int)
+  + add_event(day: str, h: int, m: int, s: int, action: str)
+  + delete_event(event_index: int)
+  + to_dict(): dict
+  + {static} from_dict(data: dict, smart_bulb: SmartBulb): Scheduler
 }
 
-' Define relationships
-Home o-- "*" SmartBulb : contains
-Home o-- "*" AirConditioner : contains
-Scheduler ..> SmartBulb : schedules
+' --- Device Subclasses ---
+
+class SmartBulb extends Device {
+  - {static} _id_counter: count
+  - _name: str
+  - _is_programmable: bool
+  - _color: str
+  + <<property>> name: str
+  + <<property>> is_programmable: bool
+  + <<property>> color: str
+  + set_color(new_color: str)
+  + to_dict(): dict
+  + {static} from_dict(data: dict): SmartBulb
+}
+
+class AirConditioner extends Device {
+  - {static} _id_counter: count
+  - _name: str
+  + <<property>> name: str
+  + <<property>> temperature: int
+  + to_dict(): dict
+  + {static} from_dict(data: dict): AirConditioner
+}
+
+' --- Persistence Module ---
+
+class "persistence" <<Module>> {
+  + save_home_to_json(home: Home, filename: str)
+  + load_home_from_json(filename: str): Home
+}
+
+' --- Relationships ---
+
+Home o-- "devices" Device : contains
+Home o-- "schedulers" Scheduler : manages
+
+Scheduler ..> SmartBulb : schedules for
+
+"persistence" ..> Home : serializes/deserializes
+"persistence" ..> SmartBulb : creates
+"persistence" ..> AirConditioner : creates
+"persistence" ..> Scheduler : creates
 
 @enduml
