@@ -40,7 +40,7 @@ def manage_device(device) -> None:
         print("  3: Increase Intensity/Temperature")
         print("  4: Decrease Intensity/Temperature")
         if isinstance(device, SmartBulb):
-            print("  5: Set Color")
+            print("  5: Change Color")
         print("  0: Return to Main Menu")
 
         choice = input("Enter your choice: ")
@@ -58,9 +58,14 @@ def manage_device(device) -> None:
                 device.decrease_intensity()
                 print("Intensity/Temperature decreased.")
             elif choice == '5' and isinstance(device, SmartBulb):
-                color = input("Enter new color: ")
-                device.set_color(color)
-                print(f"Color set to {color}.")
+                try:
+                    r = int(input("Enter Red value (0-255): "))
+                    g = int(input("Enter Green value (0-255): "))
+                    b = int(input("Enter Blue value (0-255): "))
+                    device.change_color(r, g, b)
+                    print(f"Color changed successfully.")
+                except (ValueError) as e:
+                    print(f"Error changing color: {e}. Please enter numbers between 0 and 255.")
             elif choice == '0':
                 break
             else:
