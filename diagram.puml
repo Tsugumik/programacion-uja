@@ -63,11 +63,11 @@ class SmartBulb extends Device {
   - {static} _id_counter: count
   - _name: str
   - _is_programmable: bool
-  - _color: str
+  - _color: dict
   + <<property>> name: str
   + <<property>> is_programmable: bool
-  + <<property>> color: str
-  + set_color(new_color: str)
+  + <<property>> color: dict
+  + change_color(r: int, g: int, b: int)
   + to_dict(): dict
   + {static} from_dict(data: dict): SmartBulb
 }
@@ -83,9 +83,9 @@ class AirConditioner extends Device {
 
 ' --- Persistence Module ---
 
-class "persistence" <<Module>> {
-  + save_home_to_json(home: Home, filename: str)
-  + load_home_from_json(filename: str): Home
+class Persistence <<Module>> {
+  + {static} save_home_to_json(home: Home, filename: str)
+  + {static} load_home_from_json(filename: str): Home
 }
 
 ' --- Relationships ---
@@ -95,9 +95,9 @@ Home o-- "schedulers" Scheduler : manages
 
 Scheduler ..> SmartBulb : schedules for
 
-"persistence" ..> Home : serializes/deserializes
-"persistence" ..> SmartBulb : creates
-"persistence" ..> AirConditioner : creates
-"persistence" ..> Scheduler : creates
+Persistence ..> Home : serializes/deserializes
+Persistence ..> SmartBulb : creates
+Persistence ..> AirConditioner : creates
+Persistence ..> Scheduler : creates
 
 @enduml
