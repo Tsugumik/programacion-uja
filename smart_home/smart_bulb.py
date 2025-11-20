@@ -1,103 +1,77 @@
 import itertools
+from .device import Device
 
-class SmartBulb:
-    """Represents a smart bulb."""
+class SmartBulb(Device):
+    """Represents a smart bulb, inheriting from Device."""
     _id_counter = itertools.count()
 
-    def __init__(self, name="Bulb_1", is_programmable=False):
-        self._id = f"Bulb_{next(self._id_counter)}"
+    def __init__(self, name: str, is_programmable: bool = False, color: dict = None):
+        super().__init__(min_intensity=0, max_intensity=100)
+        self._id = f"Bulb_{next(SmartBulb._id_counter)}"
         self._name = name
-        self._is_on = False
-        self._intensity = 0
-        self._color = {'r': 255, 'g': 255, 'b': 255}
         self._is_programmable = is_programmable
+        
+        # Defensive check for color data type to handle old/corrupted data
+        if isinstance(color, dict):
+            self._color = color
+        else:
+            self._color = {'r': 255, 'g': 255, 'b': 255}
 
     @property
-    def id(self):
-        """Gets the unique ID of the bulb."""
-        return self._id
-
-    @property
-    def name(self):
+    def name(self) -> str:
         """Gets the name of the bulb."""
         return self._name
 
     @property
-    def is_on(self):
-        """Checks if the bulb is on."""
-        return self._is_on
-
-    @property
-    def intensity(self):
-        """Gets the intensity of the bulb."""
-        return self._intensity
-
-    @property
-    def color(self):
-        """Gets the color of the bulb."""
-        return self._color
-
-    @property
-    def is_programmable(self):
+    def is_programmable(self) -> bool:
         """Checks if the bulb is programmable."""
         return self._is_programmable
 
-    def turn_on(self):
-        """Turns the bulb on."""
-        self._is_on = True
-        if self._intensity == 0:
-            self._intensity = 100
+    @property
+    def color(self) -> dict:
+        """Gets the current RGB color of the bulb."""
+        return self._color
 
-    def turn_off(self):
-        """Turns the bulb off."""
-        self._is_on = False
-        self._intensity = 0
-
-    def get_status(self):
-        """Gets the current status of the bulb."""
-        status = "ON" if self._is_on else "OFF"
-        return f"Bulb '{self._name}': {status}, Intensity: {self._intensity}%, Color: RGB({self._color['r']}, {self._color['g']}, {self._color['b']})"
-
-    def change_intensity(self, level):
+    def change_color(self, r: int, g: int, b: int) -> None:
         """
-        Changes the intensity of the bulb.
+        Changes the RGB color of the bulb.
 
         Args:
-            level (int): The new intensity level.
-
+            r: Red component (0-255).
+            g: Green component (0-255).
+            b: Blue component (0-255).
         Raises:
-            ValueError: If the intensity is not between 0 and 100.
+            ValueError: If any color value is outside the 0-255 range.
         """
-        if 0 <= level <= 100:
-            self._intensity = level
-        else:
-            raise ValueError("Error: Intensity must be between 0 and 100")
+        if not all(0 <= val <= 255 for val in [r, g, b]):
+            raise ValueError("Color values must be between 0 and 255.")
+        self._color = {'r': r, 'g': g, 'b': b}
 
-    def change_color(self, r, g, b):
-        """
-        Changes the color of the bulb.
+    def __str__(self) -> str:
+        status_str = "ON" if self.status else "OFF"
+        color_str = f"RGB({self._color.get('r', 0)}, {self._color.get('g', 0)}, {self._color.get('b', 0)})"
+        return (f"Device: {self.name} ({self.id})\n"
+                f"  Type: Smart Bulb\n"
+                f"  Status: {status_str}\n"
+                f"  Intensity: {self.intensity}%\n"
+                f"  Color: {color_str}")
 
-        Args:
-            r (int): Red component (0-255).
-            g (int): Green component (0-255).
-            b (int): Blue component (0-255).
+    def to_dict(self) -> dict:
+        """Returns a dictionary representation of the bulb's state."""
+        data = super().to_dict()
+        data.update({
+            "type": "SmartBulb",
+            "name": self._name,
+            "is_programmable": self._is_programmable,
+            "color": self._color
+        })
+        return data
 
-        Raises:
-            ValueError: If the color values are not between 0 and 255.
-        """
-        if all(0 <= value <= 255 for value in [r, g, b]):
-            self._color['r'] = r
-            self._color['g'] = g
-            self._color['b'] = b
-        else:
-            raise ValueError("Error: Color must be between 0 and 255")
-
-    def __str__(self):
-        header = "=" * 40
-        status_str = 'ON' if self._is_on else 'OFF'
-        return (f"{header}\n"
-                f"BULB: {self._name}\n"
-                f"Status: {status_str}\n"
-                f"Intensity: {self._intensity}%\n"
-                f"Color RGB: ({self._color['r']}, {self._color['g']}, {self._color['b']})\n"
-                f"{header}")
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Creates a SmartBulb instance from a dictionary."""
+        bulb = cls(name=data["name"], is_programmable=data["is_programmable"], color=data.get("color"))
+        bulb._id = data["id"]
+        bulb._status = data["status"]
+        bulb._intensity = data["intensity"]
+        return bulb
