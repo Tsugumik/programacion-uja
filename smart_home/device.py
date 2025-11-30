@@ -1,16 +1,12 @@
-class Device:
-    """Base class for all smart devices."""
+from abc import ABC, abstractmethod
+from typing import Dict, Any, Optional
 
-    def __init__(self, min_intensity: int, max_intensity: int):
-        """
-        Initializes a generic device.
-        The `_id` attribute is left empty and should be set by the subclass.
+class Device(ABC):
+    """Abstract base class for all smart devices."""
 
-        Args:
-            min_intensity: The minimum intensity level for the device.
-            max_intensity: The maximum intensity level for the device.
-        """
-        self._id: str = ""
+    def __init__(self, device_id: str, min_intensity: int, max_intensity: int):
+        """Initializes a generic device."""
+        self._id: str = device_id
         self._status: bool = False
         self._min_intensity: int = min_intensity
         self._max_intensity: int = max_intensity
@@ -18,60 +14,59 @@ class Device:
 
     @property
     def id(self) -> str:
-        """Gets the unique ID of the device."""
+        """The unique ID of the device."""
         return self._id
 
     @property
     def status(self) -> bool:
-        """Gets the status of the device (True for on, False for off)."""
+        """The status of the device (True for on, False for off)."""
         return self._status
 
     @property
     def intensity(self) -> int:
-        """Gets the current intensity of the device."""
+        """The current intensity of the device."""
         return self._intensity
+        
+    @property
+    def is_programmable(self) -> bool:
+        """Whether the device supports scheduling. Defaults to False."""
+        return False
 
     def turn_on(self) -> None:
         """Turns the device on."""
         self._status = True
 
     def turn_off(self) -> None:
-        """Turns the device off and resets intensity to minimum."""
+        """Turns the device off and resets intensity."""
         self._status = False
         self._intensity = self._min_intensity
 
-    def increase_intensity(self, amount: int = 1) -> None:
-        """
-        Increases the device's intensity.
+    @abstractmethod
+    def increase_intensity(self, amount: Optional[int] = None) -> None:
+        """Increases the device's intensity."""
+        pass
 
-        Args:
-            amount: The amount to increase by.
-        Raises:
-            ValueError: If the new intensity exceeds the maximum limit.
-        """
-        new_intensity = self._intensity + amount
-        if new_intensity > self._max_intensity:
-            raise ValueError(f"Intensity cannot exceed maximum value of {self._max_intensity}.")
-        self._intensity = new_intensity
+    @abstractmethod
+    def decrease_intensity(self, amount: Optional[int] = None) -> None:
+        """Decreases the device's intensity."""
+        pass
 
-    def decrease_intensity(self, amount: int = 1) -> None:
-        """
-        Decreases the device's intensity.
-
-        Args:
-            amount: The amount to decrease by.
-        Raises:
-            ValueError: If the new intensity goes below the minimum limit.
-        """
-        new_intensity = self._intensity - amount
-        if new_intensity < self._min_intensity:
-            raise ValueError(f"Intensity cannot go below minimum value of {self._min_intensity}.")
-        self._intensity = new_intensity
-
-    def to_dict(self) -> dict:
-        """Returns a dictionary representation of the device."""
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes the common device attributes to a dictionary."""
         return {
-            "id": self._id,
-            "status": self._status,
-            "intensity": self._intensity,
+            "id": self.id,
+            "status": self.status,
+            "intensity": self.intensity,
+            "type": self.__class__.__name__
         }
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Device':
+        """Creates a device object from a dictionary."""
+        pass
+
+    def __str__(self) -> str:
+        """Returns a string representation of the device."""
+        status_str = "ON" if self.status else "OFF"
+        return f"Device ID: {self.id}, Type: {self.__class__.__name__}, Status: {status_str}, Intensity: {self.intensity}"

@@ -1,103 +1,112 @@
 @startuml
-' Diagram settings
+' skinparam to make the diagram look better
 skinparam classAttributeIconSize 0
 skinparam monochrome true
-skinparam linetype ortho
-hide empty members
+skinparam shadowing false
+skinparam defaultFontName "Roboto, Helvetica"
 
-title Smart Home System
+' Title
+title Smart Home System (Practice 5)
 
-' --- Base and Core Classes ---
+' Interfaces
+interface HistoryLog {
+  + save_log(filename: str): void
+}
 
+' Abstract Classes
 abstract class Device {
-  - _id: str
-  - _status: bool
-  - _intensity: int
-  - _min_intensity: int
-  - _max_intensity: int
-  + <<property>> id: str
-  + <<property>> status: bool
-  + <<property>> intensity: int
-  + turn_on()
-  + turn_off()
-  + increase_intensity(amount: int)
-  + decrease_intensity(amount: int)
+  # _id: str
+  # _status: bool
+  # _min_intensity: int
+  # _max_intensity: int
+  # _intensity: int
+  + id: str <<get>>
+  + status: bool <<get>>
+  + intensity: int <<get>>
+  + is_programmable: bool <<get>>
+  + turn_on(): void
+  + turn_off(): void
+  + {abstract} increase_intensity(amount: int = None): void
+  + {abstract} decrease_intensity(amount: int = None): void
+  + {abstract} {classmethod} from_dict(data: dict): Device
   + to_dict(): dict
 }
 
+' Concrete Classes
 class Home {
   - _name: str
-  - _rooms: list
-  - _devices: dict
-  - _schedulers: dict
-  + <<property>> name: str
-  + <<property>> rooms: list
-  + <<property>> devices: dict
-  + add_room(room_name: str)
-  + add_device_to_room(device: Device, room: str)
-  + remove_device(device_id: str)
-  + get_device_by_id(device_id: str): Device
+  - _rooms: dict[str, Room]
+  - _schedulers: dict[str, Scheduler]
+  + name: str <<get>>
+  + rooms: list[Room] <<get>>
+  + add_room(room_name: str): Room
+  + get_room_by_name(room_name: str): Room
+  + add_device_to_room(device: Device, room_name: str): void
+  + get_all_devices(): Iterator[Device]
   + get_scheduler_for_device(device_id: str): Scheduler
-  + get_devices_in_room(room_name: str): list
+  + {classmethod} from_dict(data: dict): Home
   + to_dict(): dict
-  + {static} from_dict(data: dict): Home
+}
+
+class Room {
+  - _name: str
+  - _devices: dict[str, Device]
+  + name: str <<get>>
+  + devices: list[Device] <<get>>
+  + add_device(device: Device): void
+  + get_device_by_id(device_id: str): Device
+  + {classmethod} from_dict(data: dict, device_classes: dict): Room
+  + to_dict(): dict
+}
+
+class SmartBulb {
+  - _name: str
+  - _is_programmable_flag: bool
+  - _color: dict
+  + name: str <<get>>
+  + is_programmable: bool <<get>>
+  + color: dict <<get>>
+  + change_color(r: int, g: int, b: int): void
+  + {classmethod} from_dict(data: dict): SmartBulb
+  + to_dict(): dict
+}
+
+class AirConditioner {
+  - _name: str
+  + name: str <<get>>
+  + temperature: int <<get>>
+  + {classmethod} from_dict(data: dict): AirConditioner
+  + to_dict(): dict
 }
 
 class Scheduler {
-  - _smart_bulb: SmartBulb
+  - _device: Device
   - _schedule: list
-  + <<property>> smart_bulb: SmartBulb
-  + <<property>> schedule: list
-  + {static} get_week_days(): list
-  + {static} get_system_time(): str
-  - {static} _validate_event_time(day: str, h: int, m: int, s: int)
-  + add_event(day: str, h: int, m: int, s: int, action: str)
-  + delete_event(event_index: int)
+  + device: Device <<get>>
+  + schedule: list <<get>>
+  + add_event(day: str, hour: int, minute: int, second: int, action: str): void
+  + delete_event(event_index: int): void
+  + {classmethod} from_dict(data: dict, device: Device): Scheduler
   + to_dict(): dict
-  + {static} from_dict(data: dict, smart_bulb: SmartBulb): Scheduler
 }
 
-' --- Device Subclasses ---
-
-class SmartBulb extends Device {
-  - {static} _id_counter: count
-  - _name: str
-  - _is_programmable: bool
-  - _color: dict
-  + <<property>> name: str
-  + <<property>> is_programmable: bool
-  + <<property>> color: dict
-  + change_color(r: int, g: int, b: int)
-  + to_dict(): dict
-  + {static} from_dict(data: dict): SmartBulb
+class DataManager {
+  + {static} save_home_to_json(home: Home, filename: str): void
+  + {static} load_home_from_json(filename: str): Home | None
+  - {static} _synchronize_id_counters(home: Home): void
 }
 
-class AirConditioner extends Device {
-  - {static} _id_counter: count
-  - _name: str
-  + <<property>> name: str
-  + <<property>> temperature: int
-  + to_dict(): dict
-  + {static} from_dict(data: dict): AirConditioner
-}
+' Relationships
+Home "1" o-- "*" Room : aggregates
+Room "1" o-- "*" Device : contains
 
-' --- Persistence Module ---
+Device <|-- SmartBulb
+Device <|-- AirConditioner
 
-class Persistence <<Module>> {
-  + {static} save_home_to_json(home: Home, filename: str)
-  + {static} load_home_from_json(filename: str): Home
-}
+HistoryLog <|.. Room : implements
 
-' --- Relationships ---
-
-Home o-- "devices" Device : contains
-Home o-- "schedulers" Scheduler : manages
-
-Scheduler ..> SmartBulb : schedules for
-
-Persistence ..> Home : serializes/deserializes
-Persistence ..> SmartBulb : creates
-Persistence ..> AirConditioner : creates
-Persistence ..> Scheduler : creates
+Scheduler ..> Device : controls
+Home ..> Scheduler : manages
+Home ..> DataManager : uses
 
 @enduml
