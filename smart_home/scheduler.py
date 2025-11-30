@@ -1,36 +1,35 @@
 import time
-from .smart_bulb import SmartBulb
+from typing import List, Dict, Any
+from .device import Device
 
 class InvalidTimeError(ValueError):
     """Custom exception for invalid time values."""
     pass
 
 class Scheduler:
-    """Schedules on/off events for a SmartBulb."""
-    def __init__(self, smart_bulb: SmartBulb):
-        """
-        Initializes a Scheduler for a given SmartBulb.
-        
-        Args:
-            smart_bulb: The SmartBulb instance to be controlled.
-        """
-        if not isinstance(smart_bulb, SmartBulb):
-            raise TypeError("Scheduler must be initialized with a SmartBulb object.")
-        self._smart_bulb = smart_bulb
-        self._schedule = []  # A list of event dictionaries
+    """Schedules on/off events for any programmable device."""
+
+    def __init__(self, device: Device):
+        """Initializes a Scheduler for a given Device."""
+        if not isinstance(device, Device):
+            raise TypeError("Scheduler must be initialized with a Device object.")
+        if not device.is_programmable:
+            raise ValueError("Device must be programmable to be scheduled.")
+        self._device = device
+        self._schedule: List[Dict[str, Any]] = []
 
     @property
-    def smart_bulb(self):
-        """Gets the SmartBulb object associated with this scheduler."""
-        return self._smart_bulb
+    def device(self) -> Device:
+        """Gets the Device object associated with this scheduler."""
+        return self._device
 
     @property
-    def schedule(self):
+    def schedule(self) -> List[Dict[str, Any]]:
         """Gets the current schedule."""
         return self._schedule
 
     @classmethod
-    def get_week_days(cls) -> list:
+    def get_week_days(cls) -> List[str]:
         """Returns a list of week days in English."""
         return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -45,13 +44,13 @@ class Scheduler:
     def _validate_event_time(day: str, hour: int, minute: int, second: int):
         """Validates the day, hour, minute, and second for an event."""
         if day not in Scheduler.get_week_days():
-            raise InvalidTimeError(f"Invalid day: {day}. Must be one of {Scheduler.get_week_days()}.")
+            raise InvalidTimeError(f"Invalid day: {day}.")
         if not (0 <= hour <= 23):
-            raise InvalidTimeError(f"Invalid hour: {hour}. Must be between 0 and 23.")
+            raise InvalidTimeError(f"Invalid hour: {hour}.")
         if not (0 <= minute <= 59):
-            raise InvalidTimeError(f"Invalid minute: {minute}. Must be between 0 and 59.")
+            raise InvalidTimeError(f"Invalid minute: {minute}.")
         if not (0 <= second <= 59):
-            raise InvalidTimeError(f"Invalid second: {second}. Must be between 0 and 59.")
+            raise InvalidTimeError(f"Invalid second: {second}.")
 
     def add_event(self, day: str, hour: int, minute: int, second: int, action: str):
         """Adds an event to the schedule."""
@@ -69,25 +68,25 @@ class Scheduler:
         else:
             raise IndexError("Event index out of range.")
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """Serializes the Scheduler to a dictionary."""
-        return {
-            "schedule": self._schedule
-        }
+        return {"schedule": self._schedule}
 
     @classmethod
-    def from_dict(cls, data: dict, smart_bulb: SmartBulb):
+    def from_dict(cls, data: Dict[str, Any], device: Device) -> 'Scheduler':
         """Deserializes a Scheduler from a dictionary."""
-        scheduler = cls(smart_bulb)
+        scheduler = cls(device)
         scheduler._schedule = data.get("schedule", [])
         return scheduler
 
     def __str__(self):
         header = "=" * 40
+        # Accessing device.name which is available on SmartBulb and AirConditioner
+        device_name = getattr(self._device, 'name', self._device.id)
         schedule_str = "\n".join([f"  {i+1}: {e['day']} {e['hour']:02d}:{e['minute']:02d}:{e['second']:02d} - {e['action'].replace('_', ' ').title()}"
                                  for i, e in enumerate(self._schedule)]) if self._schedule else "  No events scheduled."
         return (f"{header}\n"
-                f"SCHEDULER for {self._smart_bulb.name}\n"
+                f"SCHEDULER for {device_name}\n"
                 f"Current System Time: {self.get_system_time()}\n"
                 f"Schedule:\n{schedule_str}\n"
                 f"{header}")
