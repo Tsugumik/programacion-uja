@@ -18,18 +18,15 @@ class ScheduleManagerDialog(tk.Toplevel):
         self.wait_window(self)
 
     def _create_widgets(self):
-        # Device selection
         device_frame = ttk.Frame(self)
         device_frame.pack(fill=tk.X, padx=10, pady=5)
         ttk.Label(device_frame, text="Select Device:").pack(side=tk.LEFT)
         device_menu = ttk.OptionMenu(device_frame, self.selected_device, "Select a device", *[d.name for d in self.devices], command=self.on_device_select)
         device_menu.pack(side=tk.LEFT, expand=True, fill=tk.X)
 
-        # Scheduler display
         self.schedule_display = tk.Listbox(self)
         self.schedule_display.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
-        # Add/Delete event buttons
         button_frame = ttk.Frame(self)
         button_frame.pack(fill=tk.X, padx=10, pady=5)
         ttk.Button(button_frame, text="Add 'Turn On' Event", command=lambda: self.add_event('turn_on')).pack(side=tk.LEFT)
@@ -61,7 +58,6 @@ class ScheduleManagerDialog(tk.Toplevel):
             messagebox.showerror("Error", "Please select a device first.")
             return
 
-        # Simple dialog for event details
         dialog = AddEventDialog(self, action)
         if dialog.result:
             day, hour, minute = dialog.result

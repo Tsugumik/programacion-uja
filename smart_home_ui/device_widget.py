@@ -9,15 +9,13 @@ class DeviceWidget(ttk.Frame):
         self.controller = controller
         self.columnconfigure(1, weight=1)
 
-        self.name_label = None # To hold the name label widget
+        self.name_label = None
         self._create_widgets()
 
     def _create_widgets(self):
-        # Device name label
         self.name_label = ttk.Label(self, text=self.device.name)
         self.name_label.grid(row=0, column=0, sticky="w")
 
-        # On/Off switch
         self.on_off_var = tk.BooleanVar(value=self.device.status)
         on_off_switch = ttk.Checkbutton(self, text="On/Off", variable=self.on_off_var, command=self.toggle_power)
         on_off_switch.grid(row=0, column=1, sticky="e")

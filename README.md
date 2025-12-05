@@ -2,8 +2,10 @@
 
 This version introduces a complete Graphical User Interface (GUI) built with Tkinter, replacing the previous command-line interface. The GUI provides a modern, user-friendly way to manage the entire smart home system, following a Model-View-Controller (MVC) architecture.
 
-- **Student:** Błażej Drozd
-- **GitHub Repository:** [https://github.com/Tsugumik/programacion-uja](https://github.com/Tsugumik/programacion-uja)
+- Student: Błażej Drozd
+- GitHub Repository: [https://github.com/Tsugumik/programacion-uja](https://github.com/Tsugumik/programacion-uja)
+
+The state of the repository for the previous assignment (Practice 5) can be found at this tag: [https://github.com/Tsugumik/programacion-uja/tree/refs/tags/practice-5](https://github.com/Tsugumik/programacion-uja/tree/refs/tags/practice-5)
 
 ## Features & Screenshots
 
@@ -61,8 +63,8 @@ To run the application, you first need to install the required libraries.
 
 This is a command-line app for managing a smart home system. You can manage rooms, devices (like Smart Bulbs and Air Conditioners), and schedules. This version is a refactor of the previous project, with a focus on better Object-Oriented Programming (OOP) principles.
 
-- **Student:** Błażej Drozd
-- **GitHub Repository:** [https://github.com/Tsugumik/programacion-uja](https://github.com/Tsugumik/programacion-uja)
+- Student: Błażej Drozd
+- GitHub Repository: [https://github.com/Tsugumik/programacion-uja](https://github.com/Tsugumik/programacion-uja)
 
 ## Unit Tests
 
