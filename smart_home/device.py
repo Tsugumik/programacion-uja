@@ -41,6 +41,15 @@ class Device(ABC):
         self._status = False
         self._intensity = self._min_intensity
 
+    def set_intensity(self, value: int) -> None:
+        """Sets the device's intensity to a specific value."""
+        if self._min_intensity <= value <= self._max_intensity:
+            self._intensity = value
+        elif value < self._min_intensity:
+            self._intensity = self._min_intensity
+        else:
+            self._intensity = self._max_intensity
+
     @abstractmethod
     def increase_intensity(self, amount: Optional[int] = None) -> None:
         """Increases the device's intensity."""
