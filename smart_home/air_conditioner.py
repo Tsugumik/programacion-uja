@@ -36,6 +36,10 @@ class AirConditioner(Device):
         """Gets the current target temperature (which is the intensity)."""
         return self.intensity
 
+    def set_temperature(self, value: int) -> None:
+        """Sets the AC's target temperature."""
+        self.set_intensity(value)
+
     def increase_intensity(self, amount: Optional[int] = None) -> None:
         """
         Increases the AC's target temperature.
