@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import sv_ttk # Import sv_ttk here
+import sv_ttk
 from .room_frame import RoomFrame
 from .add_room_dialog import AddRoomDialog
 from .schedule_manager_dialog import ScheduleManagerDialog
@@ -10,19 +10,17 @@ class MainApplicationWindow(tk.Tk):
         super().__init__()
         self.controller = controller
         self.title("Smart Home Management System")
-        self.geometry("1200x800") # Increased default width for more columns
+        self.geometry("1200x800")
 
-        sv_ttk.set_theme("dark") # Apply theme after root window is created
+        sv_ttk.set_theme("dark")
 
         self._create_widgets()
         self.refresh_rooms()
 
     def _create_widgets(self):
-        # Main frame for content
         main_frame = ttk.Frame(self)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Top control frame
         control_frame = ttk.Frame(main_frame)
         control_frame.pack(fill=tk.X, pady=(0, 10))
 
@@ -31,7 +29,6 @@ class MainApplicationWindow(tk.Tk):
         ttk.Button(control_frame, text="Save and Exit", command=self._save_and_exit).pack(side=tk.RIGHT, padx=5)
         ttk.Button(control_frame, text="Exit Without Saving", command=self._exit_without_saving).pack(side=tk.RIGHT, padx=5)
 
-        # Frame to hold room frames (scrollable)
         self.canvas = tk.Canvas(main_frame)
         self.scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = ttk.Frame(self.canvas)
@@ -50,15 +47,13 @@ class MainApplicationWindow(tk.Tk):
         self.scrollbar.pack(side="right", fill="y")
 
     def refresh_rooms(self):
-        # Clear existing room frames
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
 
         self.room_frames = []
         rooms = self.controller.get_rooms()
         
-        # --- Grid Layout Logic ---
-        columns = 3  # Define number of columns for the grid
+        columns = 3
         for i in range(columns):
             self.scrollable_frame.columnconfigure(i, weight=1)
 
@@ -67,13 +62,12 @@ class MainApplicationWindow(tk.Tk):
             col = i % columns
             
             room_frame = RoomFrame(self.scrollable_frame, room, self.controller)
-            # Use grid with padding for spacing
             room_frame.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
             self.room_frames.append(room_frame)
 
     def _open_add_room_dialog(self):
         AddRoomDialog(self, self.controller)
-        self.refresh_rooms() # Refresh after dialog closes
+        self.refresh_rooms()
 
     def _manage_schedules(self):
         ScheduleManagerDialog(self, self.controller)

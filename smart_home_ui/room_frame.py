@@ -19,7 +19,6 @@ class RoomFrame(ttk.Frame):
         self.refresh_devices()
 
     def _create_widgets(self):
-        # Room header frame
         header_frame = ttk.Frame(self)
         header_frame.grid(row=0, column=0, sticky="ew", pady=(0, 10))
         header_frame.columnconfigure(0, weight=1)
@@ -28,20 +27,17 @@ class RoomFrame(ttk.Frame):
         room_label.grid(row=0, column=0, sticky="w")
 
         add_device_button = ttk.Button(header_frame, text="Add Device", command=self._open_add_device_dialog)
-        # Add padx to create space between the label and the button
         add_device_button.grid(row=0, column=1, sticky="e", padx=(10, 0))
 
-        # Frame to hold device widgets
         self.devices_frame = ttk.Frame(self)
         self.devices_frame.grid(row=1, column=0, sticky="ew")
         self.devices_frame.columnconfigure(0, weight=1)
 
     def _open_add_device_dialog(self):
         AddDeviceDialog(self.master, self.controller, self.room)
-        self.refresh_devices() # Refresh devices after adding a new one
+        self.refresh_devices()
 
     def refresh_devices(self):
-        # Clear existing device widgets
         for widget in self.devices_frame.winfo_children():
             widget.destroy()
 
@@ -64,6 +60,5 @@ class RoomFrame(ttk.Frame):
             return DeviceWidget(parent, device, self.controller)
 
     def update_frame(self):
-        # This method can be called to update all device widgets within this room frame
         for widget in self.device_widgets:
             widget.update_widget()

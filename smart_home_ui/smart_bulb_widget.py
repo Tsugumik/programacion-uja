@@ -10,16 +10,12 @@ class SmartBulbWidget(DeviceWidget):
         self.device: SmartBulb = device
 
         self._create_bulb_widgets()
-        # Schedule the first update to run after the main loop is idle
-        # This ensures the widget is fully drawn before we try to configure it
         self.after(10, self.update_widget)
 
     def _create_bulb_widgets(self):
-        # Add (P) to name if programmable, using the new robust reference
         if self.device.is_programmable and self.name_label:
             self.name_label.config(text=f"{self.device.name} (P)")
 
-        # Intensity slider frame
         intensity_frame = ttk.Frame(self)
         intensity_frame.grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
         intensity_frame.columnconfigure(1, weight=1)
@@ -36,7 +32,6 @@ class SmartBulbWidget(DeviceWidget):
         intensity_value_label = ttk.Label(intensity_frame, textvariable=self.intensity_display_var, width=4)
         intensity_value_label.grid(row=0, column=2, sticky="e")
 
-        # Color chooser button and display
         color_frame = ttk.Frame(self)
         color_frame.grid(row=2, column=0, columnspan=2, sticky="ew", pady=5)
         color_frame.columnconfigure(1, weight=1)
@@ -44,7 +39,6 @@ class SmartBulbWidget(DeviceWidget):
         color_button = ttk.Button(color_frame, text="Change Color", command=self.change_color)
         color_button.grid(row=0, column=1, sticky="ew")
 
-        # Use a standard tk.Label as a color swatch
         self.color_display = tk.Label(color_frame, text="", relief="sunken", borderwidth=2, width=2)
         self.color_display.grid(row=0, column=0, padx=(0, 10), sticky="w")
 

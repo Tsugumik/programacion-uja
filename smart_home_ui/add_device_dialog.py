@@ -21,29 +21,23 @@ class AddDeviceDialog(tk.Toplevel):
         self.wait_window(self)
 
     def _create_widgets(self):
-        # Device Type
         ttk.Label(self, text="Device Type:").pack(padx=10, pady=5)
         device_type_menu = ttk.OptionMenu(self, self.device_type_var, "Smart Bulb", "Smart Bulb", "Air Conditioner", command=self._on_device_type_change)
         device_type_menu.pack(padx=10, pady=5, fill=tk.X)
 
-        # Device Name
         ttk.Label(self, text="Device Name:").pack(padx=10, pady=5)
         name_entry = ttk.Entry(self, textvariable=self.device_name_var)
         name_entry.pack(padx=10, pady=5, fill=tk.X)
         name_entry.focus_set()
 
-        # Programmable option (for Smart Bulb)
         self.programmable_check = ttk.Checkbutton(self, text="Programmable", variable=self.is_programmable_var)
-        # Initially hide it; _on_device_type_change will manage visibility
         self.programmable_check.pack_forget()
 
-        # Buttons
         button_frame = ttk.Frame(self)
         button_frame.pack(padx=10, pady=10)
         ttk.Button(button_frame, text="Add", command=self._add_device).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Cancel", command=self.destroy).pack(side=tk.LEFT, padx=5)
         
-        # Manually trigger the change event to set the initial state
         self._on_device_type_change()
 
     def _on_device_type_change(self, *args):
