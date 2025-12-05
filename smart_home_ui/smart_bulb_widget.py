@@ -10,18 +10,31 @@ class SmartBulbWidget(DeviceWidget):
         self.device: SmartBulb = device
 
         self._create_bulb_widgets()
+        self.update_widget() # Ensure color is set on creation
 
     def _create_bulb_widgets(self):
+        # Add (P) to name if programmable
+        if self.device.is_programmable:
+            self.children['!label']['text'] = f"{self.device.name} (P)"
+
         # Intensity slider
         intensity_label = ttk.Label(self, text="Intensity")
-        intensity_label.grid(row=1, column=0, sticky="w")
+        intensity_label.grid(row=1, column=0, sticky="w", padx=5)
         self.intensity_var = tk.IntVar(value=self.device.intensity)
         intensity_slider = ttk.Scale(self, from_=0, to=100, orient=tk.HORIZONTAL, variable=self.intensity_var, command=self.update_intensity)
-        intensity_slider.grid(row=1, column=1, sticky="ew")
+        intensity_slider.grid(row=1, column=1, sticky="ew", padx=5)
 
-        # Color chooser button
-        color_button = ttk.Button(self, text="Change Color", command=self.change_color)
-        color_button.grid(row=2, column=0, columnspan=2, sticky="ew")
+        # Color chooser button and display
+        color_frame = ttk.Frame(self)
+        color_frame.grid(row=2, column=0, columnspan=2, sticky="ew", pady=5)
+        color_frame.columnconfigure(1, weight=1)
+
+        color_button = ttk.Button(color_frame, text="Change Color", command=self.change_color)
+        color_button.grid(row=0, column=1, sticky="ew")
+
+        self.color_display = tk.Frame(color_frame, width=20, height=20, relief="sunken", borderwidth=1)
+        self.color_display.grid(row=0, column=0, padx=(0, 10), sticky="w")
+
 
     def update_intensity(self, value):
         self.device.set_intensity(int(float(value)))
@@ -43,3 +56,4 @@ class SmartBulbWidget(DeviceWidget):
     def update_widget(self):
         super().update_widget()
         self.intensity_var.set(self.device.intensity)
+        self.color_display.config(bg=self._get_color_hex())
