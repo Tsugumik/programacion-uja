@@ -28,7 +28,8 @@ class RoomFrame(ttk.Frame):
         room_label.grid(row=0, column=0, sticky="w")
 
         add_device_button = ttk.Button(header_frame, text="Add Device", command=self._open_add_device_dialog)
-        add_device_button.grid(row=0, column=1, sticky="e")
+        # Add padx to create space between the label and the button
+        add_device_button.grid(row=0, column=1, sticky="e", padx=(10, 0))
 
         # Frame to hold device widgets
         self.devices_frame = ttk.Frame(self)

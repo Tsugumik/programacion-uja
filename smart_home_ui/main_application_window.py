@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import sv_ttk # Import sv_ttk here
 from .room_frame import RoomFrame
 from .add_room_dialog import AddRoomDialog
 from .schedule_manager_dialog import ScheduleManagerDialog
@@ -9,7 +10,9 @@ class MainApplicationWindow(tk.Tk):
         super().__init__()
         self.controller = controller
         self.title("Smart Home Management System")
-        self.geometry("1000x800")
+        self.geometry("1200x800") # Increased default width for more columns
+
+        sv_ttk.set_theme("dark") # Apply theme after root window is created
 
         self._create_widgets()
         self.refresh_rooms()
@@ -55,7 +58,7 @@ class MainApplicationWindow(tk.Tk):
         rooms = self.controller.get_rooms()
         
         # --- Grid Layout Logic ---
-        columns = 2  # Define number of columns for the grid
+        columns = 3  # Define number of columns for the grid
         for i in range(columns):
             self.scrollable_frame.columnconfigure(i, weight=1)
 

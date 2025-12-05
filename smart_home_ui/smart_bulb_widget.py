@@ -10,18 +10,14 @@ class SmartBulbWidget(DeviceWidget):
         self.device: SmartBulb = device
 
         self._create_bulb_widgets()
-        self.update_widget() # Ensure color is set on creation
+        # Schedule the first update to run after the main loop is idle
+        # This ensures the widget is fully drawn before we try to configure it
+        self.after(10, self.update_widget)
 
     def _create_bulb_widgets(self):
-        # Add (P) to name if programmable
-        if self.device.is_programmable:
-            # Access the label created in DeviceWidget and modify its text
-            # Assuming the label is the first child of the DeviceWidget frame
-            # A more robust way would be to store a reference to the label in DeviceWidget
-            for child in self.winfo_children():
-                if isinstance(child, ttk.Label):
-                    child.config(text=f"{self.device.name} (P)")
-                    break
+        # Add (P) to name if programmable, using the new robust reference
+        if self.device.is_programmable and self.name_label:
+            self.name_label.config(text=f"{self.device.name} (P)")
 
         # Intensity slider frame
         intensity_frame = ttk.Frame(self)
@@ -48,7 +44,8 @@ class SmartBulbWidget(DeviceWidget):
         color_button = ttk.Button(color_frame, text="Change Color", command=self.change_color)
         color_button.grid(row=0, column=1, sticky="ew")
 
-        self.color_display = tk.Frame(color_frame, width=20, height=20, relief="sunken", borderwidth=1)
+        # Use a standard tk.Label as a color swatch
+        self.color_display = tk.Label(color_frame, text="", relief="sunken", borderwidth=2, width=2)
         self.color_display.grid(row=0, column=0, padx=(0, 10), sticky="w")
 
 
@@ -62,7 +59,6 @@ class SmartBulbWidget(DeviceWidget):
         return f'#{r:02x}{g:02x}{b:02x}'
 
     def change_color(self):
-        # askcolor returns a tuple ((r, g, b), '#rrggbb') or (None, None)
         color_tuple = askcolor(initialcolor=self._get_color_hex())
         if color_tuple and color_tuple[0] is not None:
             r, g, b = map(int, color_tuple[0])
@@ -73,4 +69,4 @@ class SmartBulbWidget(DeviceWidget):
         super().update_widget()
         self.intensity_var.set(self.device.intensity)
         self.intensity_display_var.set(f"{self.device.intensity}%")
-        self.color_display.config(bg=self._get_color_hex())
+        self.color_display.config(background=self._get_color_hex())
