@@ -15,14 +15,30 @@ class SmartBulbWidget(DeviceWidget):
     def _create_bulb_widgets(self):
         # Add (P) to name if programmable
         if self.device.is_programmable:
-            self.children['!label']['text'] = f"{self.device.name} (P)"
+            # Access the label created in DeviceWidget and modify its text
+            # Assuming the label is the first child of the DeviceWidget frame
+            # A more robust way would be to store a reference to the label in DeviceWidget
+            for child in self.winfo_children():
+                if isinstance(child, ttk.Label):
+                    child.config(text=f"{self.device.name} (P)")
+                    break
 
-        # Intensity slider
-        intensity_label = ttk.Label(self, text="Intensity")
-        intensity_label.grid(row=1, column=0, sticky="w", padx=5)
+        # Intensity slider frame
+        intensity_frame = ttk.Frame(self)
+        intensity_frame.grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
+        intensity_frame.columnconfigure(1, weight=1)
+
+        intensity_label = ttk.Label(intensity_frame, text="Intensity")
+        intensity_label.grid(row=0, column=0, sticky="w")
+
         self.intensity_var = tk.IntVar(value=self.device.intensity)
-        intensity_slider = ttk.Scale(self, from_=0, to=100, orient=tk.HORIZONTAL, variable=self.intensity_var, command=self.update_intensity)
-        intensity_slider.grid(row=1, column=1, sticky="ew", padx=5)
+        self.intensity_display_var = tk.StringVar()
+
+        intensity_slider = ttk.Scale(intensity_frame, from_=0, to=100, orient=tk.HORIZONTAL, variable=self.intensity_var, command=self.update_intensity)
+        intensity_slider.grid(row=0, column=1, sticky="ew", padx=5)
+        
+        intensity_value_label = ttk.Label(intensity_frame, textvariable=self.intensity_display_var, width=4)
+        intensity_value_label.grid(row=0, column=2, sticky="e")
 
         # Color chooser button and display
         color_frame = ttk.Frame(self)
@@ -56,4 +72,5 @@ class SmartBulbWidget(DeviceWidget):
     def update_widget(self):
         super().update_widget()
         self.intensity_var.set(self.device.intensity)
+        self.intensity_display_var.set(f"{self.device.intensity}%")
         self.color_display.config(bg=self._get_color_hex())

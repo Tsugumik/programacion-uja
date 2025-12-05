@@ -29,11 +29,8 @@ class MainApplicationWindow(tk.Tk):
         ttk.Button(control_frame, text="Exit Without Saving", command=self._exit_without_saving).pack(side=tk.RIGHT, padx=5)
 
         # Frame to hold room frames (scrollable)
-        self.room_list_frame = ttk.Frame(main_frame)
-        self.room_list_frame.pack(fill=tk.BOTH, expand=True)
-
-        self.canvas = tk.Canvas(self.room_list_frame)
-        self.scrollbar = ttk.Scrollbar(self.room_list_frame, orient="vertical", command=self.canvas.yview)
+        self.canvas = tk.Canvas(main_frame)
+        self.scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = ttk.Frame(self.canvas)
 
         self.scrollable_frame.bind(
@@ -56,9 +53,19 @@ class MainApplicationWindow(tk.Tk):
 
         self.room_frames = []
         rooms = self.controller.get_rooms()
-        for room in rooms:
+        
+        # --- Grid Layout Logic ---
+        columns = 2  # Define number of columns for the grid
+        for i in range(columns):
+            self.scrollable_frame.columnconfigure(i, weight=1)
+
+        for i, room in enumerate(rooms):
+            row = i // columns
+            col = i % columns
+            
             room_frame = RoomFrame(self.scrollable_frame, room, self.controller)
-            room_frame.pack(fill=tk.X, padx=5, pady=5, expand=True)
+            # Use grid with padding for spacing
+            room_frame.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
             self.room_frames.append(room_frame)
 
     def _open_add_room_dialog(self):
